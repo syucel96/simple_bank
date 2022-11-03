@@ -89,8 +89,6 @@ func TestTransferTx(t *testing.T) {
 		require.NotEmpty(t, toAccount)
 		require.Equal(t, account2.ID, toAccount.ID)
 
-		fmt.Println(">> tx: ", fromAccount.Balance, toAccount.Balance)
-
 		diffd1, err := util.SubtractDecimals(account1.Balance, fromAccount.Balance)
 		require.NoError(t, err)
 		diffd2, err := util.SubtractDecimals(toAccount.Balance, account2.Balance)
