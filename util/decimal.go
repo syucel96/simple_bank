@@ -49,3 +49,10 @@ func ParseFloat(d string) float64 {
 	}
 	return res
 }
+
+func IsDecimal(d string) bool {
+	if _, err := strconv.ParseFloat(d, 64); err != nil {
+		return false
+	}
+	return true
+}

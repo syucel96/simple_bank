@@ -3,7 +3,8 @@ package api
 import (
 	"database/sql"
 	"net/http"
-	"strconv"
+
+	//"strconv"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/syucel96/simplebank/db/sqlc"
@@ -11,7 +12,7 @@ import (
 
 type createAccountRequest struct {
 	Owner    string `json:"owner" binding:"required"`
-	Currency string `json:"currency" binding:"required,oneof=USD EUR GBP CAD JPY TRY"`
+	Currency string `json:"currency" binding:"required,currency"`
 }
 
 func (server *Server) createAccount(ctx *gin.Context) {
@@ -86,7 +87,7 @@ func (server *Server) listAccounts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, accounts)
 }
 
-type deleteAccountRequest struct {
+/* type deleteAccountRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
@@ -145,4 +146,4 @@ func (server *Server) updateAccount(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, account)
-}
+} */

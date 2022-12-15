@@ -18,7 +18,7 @@ func init() {
 	remaining = 63
 }
 
-func randomInt(min, max int64) int64 {
+func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min)
 }
 
@@ -35,7 +35,7 @@ func randomString(n int) string {
 }
 
 func RandomFloat(min, max int64) float64 {
-	return NewFloat(randomInt(min, max), rand.Float64())
+	return NewFloat(RandomInt(min, max), rand.Float64())
 }
 
 func RandomOwner() string {
@@ -70,7 +70,7 @@ func RandomMoney(signed bool, minMax ...int64) string {
 }
 
 func RandomCurrency() string {
-	currencies := []string{"USD", "EUR", "GBP", "CAD", "JPY", "TRY"}
+	currencies := []string{USD, EUR, GBP, CAD, JPY, TRY}
 
 	return currencies[rand.Intn(len(currencies))]
 }

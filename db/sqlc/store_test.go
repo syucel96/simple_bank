@@ -15,7 +15,6 @@ func TestTransferTx(t *testing.T) {
 
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
-	fmt.Println("before >>: ", account1.Balance, account2.Balance)
 
 	// run n concurrent go routines
 	n := 5
@@ -112,8 +111,6 @@ func TestTransferTx(t *testing.T) {
 	updatedAccount2, err := testQueries.GetAccount(context.Background(), account2.ID)
 	require.NoError(t, err)
 
-	fmt.Println(">> after: ", updatedAccount1.Balance, updatedAccount2.Balance)
-
 	require.Equal(t, util.ParseFloat(account1.Balance)-float64(n)*amountf, util.ParseFloat(updatedAccount1.Balance))
 	require.Equal(t, util.ParseFloat(account2.Balance)+float64(n)*amountf, util.ParseFloat(updatedAccount2.Balance))
 }
@@ -123,7 +120,6 @@ func TestTransferTxDeadlock(t *testing.T) {
 
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
-	fmt.Println("before >>: ", account1.Balance, account2.Balance)
 
 	// run n concurrent go routines
 	n := 10
@@ -163,8 +159,6 @@ func TestTransferTxDeadlock(t *testing.T) {
 
 	updatedAccount2, err := testQueries.GetAccount(context.Background(), account2.ID)
 	require.NoError(t, err)
-
-	fmt.Println(">> after: ", updatedAccount1.Balance, updatedAccount2.Balance)
 
 	require.Equal(t, account1.Balance, updatedAccount1.Balance)
 	require.Equal(t, account2.Balance, updatedAccount2.Balance)
