@@ -13,12 +13,14 @@ import (
 func TestTransferTx(t *testing.T) {
 	store := NewStore(testDB)
 
-	account1 := createRandomAccount(t)
-	account2 := createRandomAccount(t)
+	user1 := createRandomUser(t)
+	user2 := createRandomUser(t)
+	account1 := createRandomAccount(t, user1.Username)
+	account2 := createRandomAccount(t, user2.Username)
 
 	// run n concurrent go routines
 	n := 5
-	amount := "10"
+	amount := "10.00"
 	amountf := util.ParseFloat(amount)
 
 	errs := make(chan error)
@@ -118,8 +120,10 @@ func TestTransferTx(t *testing.T) {
 func TestTransferTxDeadlock(t *testing.T) {
 	store := NewStore(testDB)
 
-	account1 := createRandomAccount(t)
-	account2 := createRandomAccount(t)
+	user1 := createRandomUser(t)
+	user2 := createRandomUser(t)
+	account1 := createRandomAccount(t, user1.Username)
+	account2 := createRandomAccount(t, user2.Username)
 
 	// run n concurrent go routines
 	n := 10

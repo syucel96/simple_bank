@@ -10,9 +10,9 @@ import (
 	"github.com/syucel96/simplebank/util"
 )
 
-func createRandomAccount(t *testing.T) Account {
+func createRandomAccount(t *testing.T, username string) Account {
 	arg := CreateAccountParams{
-		Owner:    util.RandomOwner(),
+		Owner:    username,
 		Balance:  util.RandomMoney(false),
 		Currency: util.RandomCurrency(),
 	}
@@ -31,11 +31,13 @@ func createRandomAccount(t *testing.T) Account {
 }
 
 func TestCreateAccount(t *testing.T) {
-	createRandomAccount(t)
+	user := createRandomUser(t)
+	createRandomAccount(t, user.Username)
 }
 
 func TestGetAccount(t *testing.T) {
-	createdAccount := createRandomAccount(t)
+	user := createRandomUser(t)
+	createdAccount := createRandomAccount(t, user.Username)
 
 	account, err := testQueries.GetAccount(context.Background(), createdAccount.ID)
 	require.NoError(t, err)
@@ -49,7 +51,8 @@ func TestGetAccount(t *testing.T) {
 }
 
 func TestUpdateAccount(t *testing.T) {
-	createdAccount := createRandomAccount(t)
+	user := createRandomUser(t)
+	createdAccount := createRandomAccount(t, user.Username)
 
 	arg := UpdateAccountParams{
 		ID:      createdAccount.ID,
@@ -68,7 +71,8 @@ func TestUpdateAccount(t *testing.T) {
 }
 
 func TestDeleteAccount(t *testing.T) {
-	createdAccount := createRandomAccount(t)
+	user := createRandomUser(t)
+	createdAccount := createRandomAccount(t, user.Username)
 
 	err := testQueries.DeleteAccount(context.Background(), createdAccount.ID)
 	require.NoError(t, err)
@@ -79,9 +83,10 @@ func TestDeleteAccount(t *testing.T) {
 	require.Empty(t, account)
 }
 
-func TestLis(t *testing.T) {
+func TestListAccount(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		createRandomAccount(t)
+		user := createRandomUser(t)
+		createRandomAccount(t, user.Username)
 	}
 
 	arg := ListAccountsParams{

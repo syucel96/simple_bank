@@ -5,6 +5,9 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -20,6 +23,13 @@ func init() {
 
 func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min)
+}
+
+func randomLength(max ...int) int {
+	if len(max) > 0 {
+		return rand.Intn(max[0]-3) + 3
+	}
+	return rand.Intn(15) + 3
 }
 
 func randomString(n int) string {
@@ -73,4 +83,16 @@ func RandomCurrency() string {
 	currencies := []string{USD, EUR, GBP, CAD, JPY, TRY}
 
 	return currencies[rand.Intn(len(currencies))]
+}
+
+func RandomFullName() string {
+	return cases.Title(language.English, cases.Compact).String(fmt.Sprintf("%v %v", RandomOwner(), RandomOwner()))
+}
+
+func RandomEmail() string {
+	return fmt.Sprintf("%v@%v.com", randomString(8), randomString(5))
+}
+
+func RandomPassword() string {
+	return randomString(randomLength())
 }

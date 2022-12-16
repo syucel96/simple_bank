@@ -13,11 +13,11 @@ func NewFloat(n int64, f float64) float64 {
 func AddDecimals(d1, d2 string) (string, error) {
 	f1, err := strconv.ParseFloat(d1, 64)
 	if err != nil {
-		return "First argument", err
+		return "", err
 	}
 	f2, err := strconv.ParseFloat(d2, 64)
 	if err != nil {
-		return "Secound argument", err
+		return "", err
 	}
 	return fmt.Sprintf("%.2f", f1+f2), nil
 }
@@ -25,11 +25,11 @@ func AddDecimals(d1, d2 string) (string, error) {
 func SubtractDecimals(d1, d2 string) (string, error) {
 	f1, err := strconv.ParseFloat(d1, 64)
 	if err != nil {
-		return "First argument", err
+		return "", err
 	}
 	f2, err := strconv.ParseFloat(d2, 64)
 	if err != nil {
-		return "Secound argument", err
+		return "", err
 	}
 	return fmt.Sprintf("%.2f", f1-f2), nil
 }

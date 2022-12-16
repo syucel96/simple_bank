@@ -30,14 +30,18 @@ func createRandomTransfer(t *testing.T, fromAccountId, toAccountId *int64) Trans
 }
 
 func TestCreateTransfer(t *testing.T) {
-	account := createRandomAccount(t)
-	account2 := createRandomAccount(t)
+	user1 := createRandomUser(t)
+	user2 := createRandomUser(t)
+	account := createRandomAccount(t, user1.Username)
+	account2 := createRandomAccount(t, user2.Username)
 	createRandomTransfer(t, &account.ID, &account2.ID)
 }
 
 func TestGetTransfer(t *testing.T) {
-	account := createRandomAccount(t)
-	account2 := createRandomAccount(t)
+	user1 := createRandomUser(t)
+	user2 := createRandomUser(t)
+	account := createRandomAccount(t, user1.Username)
+	account2 := createRandomAccount(t, user2.Username)
 	createdTransfer := createRandomTransfer(t, &account.ID, &account2.ID)
 
 	transfer, err := testQueries.GetTransfer(context.Background(), createdTransfer.ID)
@@ -53,8 +57,10 @@ func TestGetTransfer(t *testing.T) {
 
 func TestListTransfers(t *testing.T) {
 	for i := 0; i < 5; i++ {
-		account := createRandomAccount(t)
-		account2 := createRandomAccount(t)
+		user1 := createRandomUser(t)
+		user2 := createRandomUser(t)
+		account := createRandomAccount(t, user1.Username)
+		account2 := createRandomAccount(t, user2.Username)
 		createRandomTransfer(t, &account.ID, &account2.ID)
 		createRandomTransfer(t, &account2.ID, &account.ID)
 	}

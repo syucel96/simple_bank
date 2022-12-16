@@ -2,11 +2,13 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	//"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 	db "github.com/syucel96/simplebank/db/sqlc"
 )
 
@@ -30,6 +32,16 @@ func (server *Server) createAccount(ctx *gin.Context) {
 
 	account, err := server.store.CreateAccount(ctx, arg)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case "foreign_key_violation":
+				ctx.JSON(http.StatusNotFound, errorResponse(fmt.Errorf("user %s does not exists", req.Owner)))
+				return
+			case "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorResponse(fmt.Errorf("user %s already has a %s account", req.Owner, req.Currency)))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
