@@ -32,7 +32,7 @@ func randomLength(max ...int) int {
 	return rand.Intn(15) + 3
 }
 
-func randomString(n int) string {
+func RandomString(n int) string {
 	var sb strings.Builder
 	k := len(alphabet)
 
@@ -49,7 +49,7 @@ func RandomFloat(min, max int64) float64 {
 }
 
 func RandomOwner() string {
-	return randomString(6)
+	return RandomString(6)
 }
 
 func randBool() bool {
@@ -90,9 +90,9 @@ func RandomFullName() string {
 }
 
 func RandomEmail() string {
-	return fmt.Sprintf("%v@%v.com", randomString(8), randomString(5))
+	return fmt.Sprintf("%v@%v.com", RandomString(8), RandomString(5))
 }
 
 func RandomPassword() string {
-	return randomString(randomLength())
+	return RandomString(10)
 }

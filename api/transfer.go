@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "github.com/syucel96/simplebank/db/sqlc"
+	"github.com/syucel96/simplebank/token"
 	"github.com/syucel96/simplebank/util"
 )
 
@@ -54,7 +55,6 @@ func (server *Server) validTransfer(ctx *gin.Context, arg db.TransferTxParams, c
 	if amount <= float64(0) {
 		err := fmt.Errorf("transfer amount needs to be greater than 0")
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		fmt.Println(err)
 		return false
 	}
 
@@ -69,15 +69,21 @@ func (server *Server) validTransfer(ctx *gin.Context, arg db.TransferTxParams, c
 	}
 
 	if fromAccount.Currency != currency {
-		err = fmt.Errorf("account %v currency mismatch: expected %v, got %v", fromAccount.ID, fromAccount.Currency, currency)
+		err = fmt.Errorf("account %d currency mismatch: expected %s, got %s", fromAccount.ID, fromAccount.Currency, currency)
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return false
 	}
 
 	if amount > util.ParseFloat(fromAccount.Balance) {
-		err = fmt.Errorf("account %v insufficient funds: balance %v is less than requested amount %v", fromAccount.ID, fromAccount.Balance, arg.Amount)
+		err = fmt.Errorf("account %d insufficient funds: balance %s is less than requested amount %s", fromAccount.ID, fromAccount.Balance, arg.Amount)
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		fmt.Println(err)
+		return false
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if fromAccount.Owner != authPayload.Username {
+		err = fmt.Errorf("from account doesn't belong to the authenticated user %s", authPayload.Username)
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return false
 	}
 
@@ -92,7 +98,7 @@ func (server *Server) validTransfer(ctx *gin.Context, arg db.TransferTxParams, c
 	}
 
 	if toAccount.Currency != currency {
-		err = fmt.Errorf("account %v currency mismatch: expected %v, got %v", toAccount.ID, toAccount.Currency, currency)
+		err = fmt.Errorf("account %d currency mismatch: expected %s, got %s", toAccount.ID, toAccount.Currency, currency)
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return false
 	}

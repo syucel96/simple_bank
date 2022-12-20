@@ -53,7 +53,7 @@ func TestGetUser(t *testing.T) {
 	require.WithinDuration(t, createdUser.CreatedAt, user.CreatedAt, time.Microsecond)
 }
 
-func TestListUser(t *testing.T) {
+/* func TestListUser(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		createRandomUser(t)
 	}
@@ -70,4 +70,4 @@ func TestListUser(t *testing.T) {
 	for _, user := range users {
 		require.NotEmpty(t, user)
 	}
-}
+} */

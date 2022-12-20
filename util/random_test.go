@@ -31,7 +31,7 @@ func TestRandomLength(t *testing.T) {
 
 func TestRandomString(t *testing.T) {
 	randLen := randomLength()
-	randStr := randomString(randLen)
+	randStr := RandomString(randLen)
 	require.NotEmpty(t, randStr)
 	require.IsType(t, "", randStr)
 	require.Len(t, randStr, randLen)

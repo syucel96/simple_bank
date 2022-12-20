@@ -10,11 +10,20 @@ import (
 	"github.com/syucel96/simplebank/util"
 )
 
-func createRandomAccount(t *testing.T, username string) Account {
-	arg := CreateAccountParams{
-		Owner:    username,
-		Balance:  util.RandomMoney(false),
-		Currency: util.RandomCurrency(),
+func createRandomAccount(t *testing.T, username string, fields ...string) Account {
+	var arg CreateAccountParams
+	if len(fields) == 0 {
+		arg = CreateAccountParams{
+			Owner:    username,
+			Balance:  util.RandomMoney(false),
+			Currency: util.RandomCurrency(),
+		}
+	} else {
+		arg = CreateAccountParams{
+			Owner:    username,
+			Balance:  util.RandomMoney(false),
+			Currency: fields[0],
+		}
 	}
 
 	account, err := testQueries.CreateAccount(context.Background(), arg)
@@ -84,21 +93,35 @@ func TestDeleteAccount(t *testing.T) {
 }
 
 func TestListAccount(t *testing.T) {
-	for i := 0; i < 10; i++ {
-		user := createRandomUser(t)
-		createRandomAccount(t, user.Username)
+	user := createRandomUser(t)
+	currencies := []string{util.USD, util.EUR, util.GBP, util.CAD, util.JPY, util.TRY}
+	for i := range currencies {
+		createRandomAccount(t, user.Username, currencies[i])
+	}
+
+	limit := int32(util.RandomInt(int64(2), int64(6)))
+	offset := int32(util.RandomInt(int64(0), int64(3)))
+
+	var expected int32
+	if limit+offset > 6 {
+		expected = 6 - offset
+	} else {
+		expected = limit
 	}
 
 	arg := ListAccountsParams{
-		Limit:  5,
-		Offset: 5,
+		Owner:  user.Username,
+		Limit:  limit,
+		Offset: offset,
 	}
 
 	accounts, err := testQueries.ListAccounts(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, accounts, 5)
+	require.Len(t, accounts, int(expected))
 
-	for _, account := range accounts {
+	for i, account := range accounts {
 		require.NotEmpty(t, account)
+		require.Equal(t, currencies[i+int(offset)], account.Currency)
+		require.Equal(t, user.Username, account.Owner)
 	}
 }

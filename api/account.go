@@ -10,10 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	db "github.com/syucel96/simplebank/db/sqlc"
+	"github.com/syucel96/simplebank/token"
 )
 
 type createAccountRequest struct {
-	Owner    string `json:"owner" binding:"required"`
 	Currency string `json:"currency" binding:"required,currency"`
 }
 
@@ -24,8 +24,10 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
 	arg := db.CreateAccountParams{
-		Owner:    req.Owner,
+		Owner:    authPayload.Username,
 		Currency: req.Currency,
 		Balance:  "0.00",
 	}
@@ -35,10 +37,10 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Code.Name() {
 			case "foreign_key_violation":
-				ctx.JSON(http.StatusNotFound, errorResponse(fmt.Errorf("user %s does not exists", req.Owner)))
+				ctx.JSON(http.StatusNotFound, errorResponse(fmt.Errorf("user %s does not exists: %w", authPayload.Username, pqErr)))
 				return
 			case "unique_violation":
-				ctx.JSON(http.StatusForbidden, errorResponse(fmt.Errorf("user %s already has a %s account", req.Owner, req.Currency)))
+				ctx.JSON(http.StatusForbidden, errorResponse(fmt.Errorf("user %s already has a %s account: %w", authPayload.Username, req.Currency, pqErr)))
 				return
 			}
 		}
@@ -70,6 +72,13 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if account.Owner != authPayload.Username {
+		err = fmt.Errorf("account does not belong to the authenticated user: %s", authPayload.Username)
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	ctx.JSON(http.StatusOK, account)
 }
 
@@ -85,7 +94,9 @@ func (server *Server) listAccounts(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.ListAccountsParams{
+		Owner:  authPayload.Username,
 		Offset: req.PageSize * (req.PageID - 1),
 		Limit:  req.PageSize,
 	}
